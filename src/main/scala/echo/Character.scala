@@ -25,6 +25,27 @@
 
 
 package rpg
+package echo
 
-package object echo {
+class Character(val name: String) extends rpg.Character[Attribute,Skill] {
+  val attributes = new Attributes[Attribute] {
+    override lazy val defaultAttributeValues = (a: Attribute) => 2
+    override def check(a: Attribute) = new EchoCheck(a, attributes(a))
+  }
+
+  val skills = new Skills[Attribute,Skill] {
+    override lazy val defaultSkillValues = (s: Skill) => -1
+    override def check(s: Skill) = new EchoCheck(s, skills(s))
+  }
+
+  val hitpoints = new HitPoints {
+    override def maxhp = 6 + 2 * attributes(Stamina)
+  }
+/*
+  def lowhpMod = hp match {
+    case hp if hp < maxhp * 2 / 3. => -1
+    case hp if hp < maxhp     / 3. => -2
+    case _                         =>  0
+  }
+*/
 }

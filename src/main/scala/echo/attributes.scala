@@ -27,22 +27,13 @@
 package rpg
 package echo
 
-/** Contains attribute-related messages. */
-object Attribute {
-  /** Message that will issue the change of an attribute. */
-  case class ModifyAttribute(attribute: Attribute, mod: Int => Int)
-
-  /** Message that will check the attribute. */
-  case class CheckAttribute(attribute: Attribute, lvl: Int, mod: Int => Int = identity)
-}
-
 /** Attributes represent natural abilities of a character.
  *
  *  Attributes are categorized twice into three groups: [[rpg.echo.Mental]],
  *  [[rpg.echo.Physical]], [[rpg.echo.Social]] and [[rpg.echo.Power]],
  *  [[rpg.echo.Finesse]], [[rpg.echo.Resistance]].
  */
-sealed abstract class Attribute extends GenericAttribute
+sealed abstract class Attribute extends rpg.Attribute
 
 /** Mental attributes represent insightfulness, cleverness and determination. */
 sealed trait Mental

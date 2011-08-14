@@ -25,6 +25,7 @@
 
 
 package rpg
+package echo
 
-package object echo {
-}
+case class Skill(name: String, defaultAttributes: List[Attribute])
+  extends rpg.Skill[Attribute]

@@ -25,6 +25,45 @@
 
 
 package rpg
+package echo
 
-package object echo {
+/** Provides useful aliases and implicit conversions for command line
+  * interfaces.
+  *
+  * This package is automatically imported by the sbt console task.
+  *
+  * The aliases are short and lowercase to type them fast and should not be used
+  * within the project because they are much harder to understand than usual
+  * descriptors.
+  */
+package object cli {
+
+  // -------------------------------------------------------------------
+  // attribute related aliases
+  // -------------------------------------------------------------------
+
+  val int = Intelligence
+  val wit = Wits
+  val res = Resolve
+  val str = Strength
+  val dex = Dexterity
+  val sta = Stamina
+  val pre = Presence
+  val man = Manipulation
+  val com = Composure
+
+  // -------------------------------------------------------------------
+  // hit point related aliases
+  // -------------------------------------------------------------------
+
+  val  dmg  = HitPoints.Damage
+  val  life = HitPoints.Life
+
+  // -------------------------------------------------------------------
+  // implicit conversions
+  // -------------------------------------------------------------------
+
+  implicit def int2intfunc(i: Int): Function1[Int,Int] = Int => i
+  implicit def attr2list(attr: Attribute) = List(attr)
+  implicit def skill2list(skill: Skill) = List(skill)
 }

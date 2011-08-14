@@ -27,27 +27,21 @@
 package rpg
 package echo
 
-/** Provides factory methods to get the result depending on the abilities of
-  * both actor and reactor.
-  */
-object Result {
-  /** Returns the result depending on the abilities of both actor and reactor. */
-  def apply(actor: Int, reactor: Int): Result = actor match {
-    case n if n < 1 => Incapable
-    case n          => Result(chance(actor - reactor))
+object EchoCheck {
+  def check(actor: Int, reactor: Int)(description: => String): Result = actor match {
+    case n if n < 1 => Incapable()
+    case n          => EchoCheck.check(chance(actor - reactor), description)
   }
 
-  /** Returns the result depending on the chance of success. */
-  def apply(chance: Int) = chance match {
-    case chance if chance <=   0 => Inferior
-    case chance if chance >= 100 => Superior
+  private def check(chance: Int, description: => String): Result = chance match {
+    case chance if chance <=   0 => Inferior()
+    case chance if chance >= 100 => Superior()
     case chance                  => (chance - util.Random.nextInt(100) + 1) match {
-      case diff if diff > 0 => Succeeded(diff)
-      case diff             => Failed(diff)
+      case diff if diff > 0 => Succeeded()
+      case diff             => Failed()
     }
   }
 
-  /** Returns the chance in percent depending on the ability difference. */
   private def chance(diff: Int) = diff match {
     case n if n < -3 =>   0
     case          -3 =>   2
@@ -61,30 +55,24 @@ object Result {
   }
 }
 
-/** Represents the outcome of a check.
-  *
-  * @see [[rpg.echo.Success]]
-  * @see [[rpg.echo.Failure]]
-  */
-sealed trait Result
+case class EchoCheck(
+    actorChecked: Any,
+    actorValue: Int,
+    reactorChecked: Any,
+    reactorValue: Int)
+  extends Check {
 
-/** The actor succeeded in any way. */
-sealed trait Success extends Result
+  def this(checked: Any, value: Int) =
+    this(checked, value, checked, value)
 
-/** The actor failed in any way. */
-sealed trait Failure extends Result
+  override def vs(difficulty: Int) = copy(reactorValue = difficulty)
 
-/** The actor is incapable of performing the check. */
-case object Incapable extends Failure
+  override def under(mod: Mod[Int]) = copy(actorValue = mod(actorValue))
 
-/** The actor is inferior. */
-case object Inferior extends Failure
+  def result = EchoCheck.check(actorValue, reactorValue) {
+    actorChecked + "(" + actorValue + ") vs " +
+    reactorChecked + "(" + reactorValue + ")"
+  }
 
-/** The actor is superior. */
-case object Superior extends Success
-
-/** The actor failed. */
-case class Failed(diff: Int) extends Failure
-
-/** The actor succeeded. */
-case class Succeeded(diff: Int) extends Success
+  override def toString = result.toString
+}
