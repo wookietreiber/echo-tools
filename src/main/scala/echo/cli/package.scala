@@ -63,7 +63,6 @@ package object cli {
   // implicit conversions
   // -------------------------------------------------------------------
 
-  implicit def int2intfunc(i: Int): Function1[Int,Int] = Int => i
   implicit def attr2list(attr: Attribute) = List(attr)
   implicit def skill2list(skill: Skill) = List(skill)
 }

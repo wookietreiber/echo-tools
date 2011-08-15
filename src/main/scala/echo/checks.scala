@@ -27,10 +27,10 @@
 package rpg
 package echo
 
-object EchoCheck {
+object Check {
   def check(actor: Int, reactor: Int)(description: => String): Result = actor match {
     case n if n < 1 => Incapable()
-    case n          => EchoCheck.check(chance(actor - reactor), description)
+    case n          => Check.check(chance(actor - reactor), description)
   }
 
   private def check(chance: Int, description: => String): Result = chance match {
@@ -55,12 +55,12 @@ object EchoCheck {
   }
 }
 
-case class EchoCheck(
+case class Check(
     actorChecked: Any,
     actorValue: Int,
     reactorChecked: Any,
     reactorValue: Int)
-  extends Check {
+  extends rpg.Check {
 
   def this(checked: Any, value: Int) =
     this(checked, value, checked, value)
@@ -69,7 +69,7 @@ case class EchoCheck(
 
   override def under(mod: Mod[Int]) = copy(actorValue = mod(actorValue))
 
-  def result = EchoCheck.check(actorValue, reactorValue) {
+  def result = Check.check(actorValue, reactorValue) {
     actorChecked + "(" + actorValue + ") vs " +
     reactorChecked + "(" + reactorValue + ")"
   }

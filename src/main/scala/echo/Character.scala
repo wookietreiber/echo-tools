@@ -30,7 +30,7 @@ package echo
 class Character(val name: String) extends rpg.Character[Attribute,Skill] {
   val attributes = new Attributes[Attribute] {
     override lazy val defaultAttributeValues = (a: Attribute) => 2
-    override def check(a: Attribute) = new EchoCheck(a, attributes(a))
+    override def check(a: Attribute) = new Check(a, attributes(a))
   }
 
   val skills = new Skills[Attribute,Skill] {
@@ -39,7 +39,7 @@ class Character(val name: String) extends rpg.Character[Attribute,Skill] {
       val avsAvg = avg(using map { attributes(_) })
       var sv = skills(s)
       sv = avg(List(sv,sv,avsAvg))
-      new EchoCheck(s, sv)
+      new Check(s, sv)
     }
   }
 
