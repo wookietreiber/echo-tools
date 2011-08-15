@@ -27,19 +27,21 @@
 package rpg
 package echo
 
-class Character(val name: String) extends rpg.Character[Attribute,Skill] {
-  val attributes = new Attributes[Attribute] {
+class Character(val name: String)
+  extends rpg.Character[Attribute,Skill,Check[Attribute],Check[Skill]] {
+
+  val attributes = new Attributes[Attribute,Check[Attribute]] {
     override lazy val defaultAttributeValues = (a: Attribute) => 2
-    override def check(a: Attribute) = new Check(a, attributes(a))
+    override def check(a: Attribute) = Check(name, a, attributes(a))
   }
 
-  val skills = new Skills[Attribute,Skill] {
+  val skills = new Skills[Attribute,Skill,Check[Skill]] {
     override lazy val defaultSkillValues = (s: Skill) => -1
     override def check(s: Skill, using: List[Attribute]) = {
       val avsAvg = avg(using map { attributes(_) })
       var sv = skills(s)
       sv = avg(List(sv,sv,avsAvg))
-      new Check(s, sv)
+      Check(name, s, sv)
     }
   }
 

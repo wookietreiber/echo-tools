@@ -27,18 +27,23 @@
 package rpg
 package echo
 
+import rpg.Check.Checkee
+
 object Check {
-  def check(actor: Int, reactor: Int)(description: => String): Result = actor match {
-    case n if n < 1 => Incapable()
-    case n          => Check.check(chance(actor - reactor), description)
+  def apply[A](description: String, checked: A, value: Int) =
+    new Check(Checkee(description, checked, value))
+
+  def check(actor: Int, reactor: Int): Result = actor match {
+    case n if n < 1 => Incapable
+    case n          => Check.check(chance(actor - reactor))
   }
 
-  private def check(chance: Int, description: => String): Result = chance match {
-    case chance if chance <=   0 => Inferior()
-    case chance if chance >= 100 => Superior()
+  private def check(chance: Int): Result = chance match {
+    case chance if chance <=   0 => Inferior
+    case chance if chance >= 100 => Superior
     case chance                  => (chance - util.Random.nextInt(100) + 1) match {
-      case diff if diff > 0 => Succeeded()
-      case diff             => Failed()
+      case diff if diff > 0 => Succeeded(diff.toString)
+      case diff             => Failed(diff.toString)
     }
   }
 
@@ -55,24 +60,15 @@ object Check {
   }
 }
 
-case class Check(
-    actorChecked: Any,
-    actorValue: Int,
-    reactorChecked: Any,
-    reactorValue: Int)
-  extends rpg.Check {
+case class Check[A](
+    checkee: Checkee[A],
+    opponent: Option[Checkee[A]] = None)
+  extends rpg.Check[A,Check[A]] {
 
-  def this(checked: Any, value: Int) =
-    this(checked, value, checked, value)
+  def copy(checkee: Checkee[A] = checkee, opponent: Option[Checkee[A]] = opponent) =
+    new Check(checkee, opponent)
 
-  override def vs(difficulty: Int) = copy(reactorValue = difficulty)
-
-  override def under(mod: Mod[Int]) = copy(actorValue = mod(actorValue))
-
-  def result = Check.check(actorValue, reactorValue) {
-    actorChecked + "(" + actorValue + ") vs " +
-    reactorChecked + "(" + reactorValue + ")"
-  }
-
-  override def toString = result.toString
+  def result = Check.check(
+    checkee.value,
+    opponent.map { _.value } getOrElse checkee.value)
 }
