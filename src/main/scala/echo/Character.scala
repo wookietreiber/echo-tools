@@ -35,7 +35,12 @@ class Character(val name: String) extends rpg.Character[Attribute,Skill] {
 
   val skills = new Skills[Attribute,Skill] {
     override lazy val defaultSkillValues = (s: Skill) => -1
-    override def check(s: Skill) = new EchoCheck(s, skills(s))
+    override def check(s: Skill, using: List[Attribute]) = {
+      val avsAvg = avg(using map { attributes(_) })
+      var sv = skills(s)
+      sv = avg(List(sv,sv,avsAvg))
+      new EchoCheck(s, sv)
+    }
   }
 
   val hitpoints = new HitPoints {

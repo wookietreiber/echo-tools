@@ -27,4 +27,5 @@
 package rpg
 
 package object echo {
+  val avg = (vs: Seq[Int]) => (vs.sum / vs.size.toFloat).round
 }
